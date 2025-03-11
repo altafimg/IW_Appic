@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   View,
   Text,
@@ -25,6 +25,7 @@ import noticeIcon from '../../../assets/images/noticeIcon.png';
 import edit from '../../../assets/images/Edit.png';
 import ContentUsageRightsPopup from '../../popups/ContentUsageRightsPopup';
 import {useSelector} from 'react-redux';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const CreateNewQuickAdModel = ({
   about,
@@ -64,10 +65,7 @@ const CreateNewQuickAdModel = ({
     const numericValue = text.replace(/[^0-9]/g, '');
     setNumber(numericValue);
   };
-  console.log(
-    'e=======disclosureNoticeData',
-    JSON.stringify(disclosureNoticeData),
-  );
+
   const loading = useSelector(state => state.imageUploadReducer.loading);
   const renderItem = ({item}) => {
     const quationData = item?.data;
@@ -80,7 +78,7 @@ const CreateNewQuickAdModel = ({
     });
     const filteredData = mergedData?.filter(item => item?.answer);
     return (
-      <>
+      <View style={{marginVertical: 10}}>
         <View
           style={{
             flexDirection: 'row',
@@ -127,9 +125,6 @@ const CreateNewQuickAdModel = ({
           {AppLocalizedStrings.createNewQuickAdModel.asked}
         </Text>
         <Divider style={{marginVertical: 10}} />
-        {console.log('mergedData=======', mergedData?.length)}
-        {console.log('filteredData=======', filteredData?.length)}
-
         {filteredData?.length > 0 && mergedData.length > 0
           ? mergedData?.map((item, index) => (
               <View key={index.toString()} style={styles.itemContainer}>
@@ -145,28 +140,8 @@ const CreateNewQuickAdModel = ({
                 </View>
               </View>
             ))
-          : // <FlatList
-            //   data={mergedData}
-            //   keyExtractor={(item, index) => index?.toString()} // Ensure each item has a unique key
-            //   renderItem={item => {
-            //     return (
-            //       <View style={styles.itemContainer}>
-            //         <Text style={styles.question}>{item?.item?.number}</Text>
-            //         <Text style={styles.text}>{item?.item?.title}</Text>
-            //         <View style={{flexDirection: 'row', marginTop: hp(1)}}>
-            //           <Text style={{color: 'black'}}>
-            //             {AppLocalizedStrings?.createNewQuickAdModel?.ad}
-            //           </Text>
-            //           <Text style={{color: '#1DA1F2', marginLeft: hp(1)}}>
-            //             {item?.item?.answer}
-            //           </Text>
-            //         </View>
-            //       </View>
-            //     );
-            //   }}
-            // />
-            null}
-      </>
+          : null}
+      </View>
     );
   };
 

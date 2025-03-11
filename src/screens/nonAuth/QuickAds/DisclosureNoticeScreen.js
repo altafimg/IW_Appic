@@ -8,7 +8,7 @@ import {
   FlatList,
   View,
 } from 'react-native';
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {ScaledSheet, scale} from 'react-native-size-matters';
 import BackArrow from '../../../components/buttons/BackArrow';
 import {AppLocalizedStrings} from '../../../localization/Localization';
@@ -22,6 +22,7 @@ import unChecked from '../../../assets/images/unChecked.png';
 import Question from '../../../assets/images/questions.png';
 import plus from '../../../assets/images/plus.png';
 import BottomCard from './BottomCard';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const DisclosureNoticeScreen = ({navigation, route}) => {
   // const {adText, setAdText} = route.params;
@@ -149,34 +150,49 @@ const DisclosureNoticeScreen = ({navigation, route}) => {
       selectedTitle: selectedItem?.title,
     });
   };
-
-  const renderItem = ({item, index}) => (
-    <View style={styles.itemContainer}>
-      <TouchableOpacity
-        style={styles.itemContainerSec}
-        onPress={() => {
-          toggleStatus(item.id);
-        }}>
-        <Image
-          source={item.status ? checked : unChecked}
-          style={styles.checkbox}
-        />
-        <Text style={styles.text}>{item.title}</Text>
-        {item.title === 'Political Advertisement' && (
+  const [disabledTitles, setDisabledTitles] = useState([]);
+  useEffect(async () => {
+    const savedDisclosureNotice = await AsyncStorage.getItem(
+      'disclosureNoticeData',
+    );
+    if (savedDisclosureNotice != null) {
+      setDisabledTitles(savedDisclosureNotice);
+    } else {
+      setDisabledTitles([]);
+    }
+  }, []);
+  // Titles to be disabled
+  const renderItem = ({item, index}) => {
+    const isDisabled = disabledTitles?.includes(item.title);
+    return (
+      <View style={styles.itemContainer}>
+        <TouchableOpacity
+          disabled={isDisabled}
+          style={styles.itemContainerSec}
+          onPress={() => {
+            toggleStatus(item?.id);
+          }}>
           <Image
-            source={Question}
-            style={{width: scale(15), height: scale(15)}}
+            source={item.status ? checked : unChecked}
+            style={styles.checkbox}
           />
+          <Text
+            style={[styles.text, {color: isDisabled ? '#A6A6AA' : 'black'}]}>
+            {item.title}
+          </Text>
+          {item.title === 'Political Advertisement' && (
+            <Image
+              source={Question}
+              style={{width: scale(15), height: scale(15)}}
+            />
+          )}
+        </TouchableOpacity>
+        {!isDisabled && (
+          <Image source={plus} style={{width: scale(15), height: scale(15)}} />
         )}
-      </TouchableOpacity>
-      {/* <TouchableOpacity
-        onPress={() => {
-          handleSavePopup(item.id);
-        }}> */}
-      <Image source={plus} style={{width: scale(15), height: scale(15)}} />
-      {/* </TouchableOpacity> */}
-    </View>
-  );
+      </View>
+    );
+  };
   // const handleSave = () => {
   //   const selectedTitle = data.find(item => item.status === true)?.title;
   //   const isQuestionRequried = data.find(item => item.question === true);

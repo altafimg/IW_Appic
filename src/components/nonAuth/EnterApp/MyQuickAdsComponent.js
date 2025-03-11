@@ -22,23 +22,21 @@ import RenderMyQuickItem from '../QuickAds/RenderMyQuickItem';
 //images
 import no_post from '../../../assets/images/no_quickads.png';
 import MyQuickAdsSearchPopup from '../../popups/MyQuickAdsSearchPopup';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const MyQuickAdsComponent = props => {
   const isFocused = useIsFocused();
   const dispatch = useDispatch();
-
   const verifiedStatus = useSelector(
     state =>
       state.getLoggedInUserProfileReducer.data?.data?.data?.user_verify_status,
   );
-
   const navigation = useNavigation('');
   const selectedButton = props.selectedButton;
   const setSelectedButton = props.setSelectedButton;
   const userType = useSelector(
     state => state.loginReducer?.user?.data?.data?.user_role,
   );
-
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState('');
   const [value, setValue] = useState('All');
@@ -58,6 +56,24 @@ const MyQuickAdsComponent = props => {
   useEffect(() => {
     LogBox.ignoreLogs(['VirtualizedLists should never be nested']);
   }, []);
+  useEffect(() => {
+    removeDisclosureNotice();
+  }, []);
+  const removeDisclosureNotice = async () => {
+    try {
+      const savedDisclosureNotice = await AsyncStorage.getItem(
+        'disclosureNoticeData',
+      );
+      if (savedDisclosureNotice !== null) {
+        await AsyncStorage.removeItem('disclosureNoticeData');
+        console.log('Item removed from storage');
+      } else {
+        console.log('No item found in storage');
+      }
+    } catch (error) {
+      console.error('Error removing item:', error);
+    }
+  };
 
   const token = useSelector(state => state.loginReducer?.token);
   const _id = useSelector(state => state.loginReducer?.user?.data?.data?._id);

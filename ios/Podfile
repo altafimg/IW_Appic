@@ -36,8 +36,8 @@ target 'InfluenceWith' do
   use_react_native!(
     :path => config[:reactNativePath],
     # Hermes is now enabled by default. Disable by setting this flag to false.
-    :hermes_enabled => flags[:hermes_enabled],
-    # :hermes_enabled => false,  # Disable Hermes
+    # :hermes_enabled => flags[:hermes_enabled],
+    :hermes_enabled => true,  # Disable Hermes
     :fabric_enabled => flags[:fabric_enabled],
     # Enables Flipper.
     #
